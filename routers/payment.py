@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query
-from dotenv import load_dotenv
-import bcchapi
-import os
-import numpy as np
+from fastapi import APIRouter, HTTPException, Query # Importar las librerías necesarias
+from dotenv import load_dotenv # Para cargar variables de entorno desde un archivo .env
+import bcchapi # Asegúrate de tener instalado el paquete bcchapi
+import os # Para manejar las variables de entorno
+import numpy as np # Para manejar operaciones numéricas
 
 # Cargar las variables del archivo .env
 load_dotenv(dotenv_path="credentials.env")
@@ -18,9 +18,9 @@ if not email or not password:
 # Inicializa la conexión con el Banco Central usando argumentos POSICIONALES
 siete = bcchapi.Siete(email, password)
 
-router = APIRouter()
+router = APIRouter() # Define el router para las rutas de pago
 
-@router.get("/conversion/dolar-peso")
+@router.get("/conversion/dolar-peso") # Define la ruta para la conversión de dólar a peso chileno
 async def conversion_dolar_peso(monto: float = Query(1.0, gt=0, description="Monto en USD a convertir")):
     try:
         serie_dolar = "F073.TCO.PRE.Z.D"  # Código de la serie del dólar observado

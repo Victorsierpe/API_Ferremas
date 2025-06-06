@@ -1,42 +1,44 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional 
-from datetime import datetime # Importa las bibliotecas necesarias
+from pydantic import BaseModel, EmailStr # importa BaseModel y EmailStr de pydantic
+from typing import Optional #importa Optional para tipos que pueden ser None
+from datetime import datetime # importa datetime para manejar fechas y horas
 
-class PrecioHistoricoBase(BaseModel): # Define la clase base para los precios históricos
-    fecha: Optional[datetime] = None
-    precio: float
+class PrecioHistoricoBase(BaseModel): # define la clase base para el historial de precios
+    fecha: Optional[datetime] = None # define la fecha como opcional, con valor por defecto None
+    precio: float # define el precio como un flotante
 
-class PrecioHistoricoCreate(PrecioHistoricoBase): # Define la clase para crear precios históricos
-    producto_id: int
+class PrecioHistoricoCreate(PrecioHistoricoBase): # define la clase para crear un historial de precios
+    producto_id: int # define el ID del producto como un entero
 
-class PrecioHistorico(PrecioHistoricoBase): # Define la clase para los precios históricos
+class PrecioHistorico(PrecioHistoricoBase):
     id: int
     producto_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-class ProductoCreate(BaseModel): # Define la clase base para los productos
+class ProductoCreate(BaseModel):
     codigo: str
     marca: str
     nombre: str
     modelo: str
     stock: int
 
-class Producto(ProductoCreate): # Define la clase para los productos
+class Producto(ProductoCreate):
     id: int
-    class Config:
-        orm_mode = True
 
-class ContactoBase(BaseModel): # Define la clase base para los contactos
+    class Config:
+        from_attributes = True
+
+class ContactoBase(BaseModel):
     nombre: str
     email: EmailStr
     mensaje: str
 
-class ContactoCreate(ContactoBase): # Define la clase para crear contactos
+class ContactoCreate(ContactoBase):
     pass
 
-class Contacto(ContactoBase): # Define la clase para los contactos
+class Contacto(ContactoBase):
     id: int
+
     class Config:
-        orm_mode = True
+        from_attributes = True

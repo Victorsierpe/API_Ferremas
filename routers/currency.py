@@ -1,31 +1,44 @@
 from fastapi import APIRouter, HTTPException, Query
-import bcchapi # Librería para acceder al Banco Central de Chile
+from dotenv import load_dotenv
+import bcchapi
+import os
 import numpy as np
 
-router = APIRouter()
+# Cargar variables desde el archivo .env
+load_dotenv(dotenv_path="credentials.env")
 
-siete = bcchapi.Siete(file="credentials.txt") # Inicializa la conexión con el Banco Central usando credenciales
+# Obtener credenciales desde variables de entorno
+email = os.getenv("BCCH_EMAIL")
+password = os.getenv("BCCH_PASSWORD")
+
+# Validación de credenciales
+if not email or not password:
+    raise ValueError("Faltan variables de entorno: BCCH_EMAIL o BCCH_PASSWORD")
+
+# Inicializa la conexión con el Banco Central usando argumentos POSICIONALES
+siete = bcchapi.Siete(email, password)
+
+router = APIRouter()
 
 @router.get("/conversion/dolar-peso")
 async def conversion_dolar_peso(monto: float = Query(1.0, gt=0, description="Monto en USD a convertir")):
     try:
-        serie_dolar = "F073.TCO.PRE.Z.D" # Código de la serie del dólar observado
+        serie_dolar = "F073.TCO.PRE.Z.D"
 
         df = siete.cuadro(
-            series=[serie_dolar],# CRealice una petición al BCCh para recuperar la última tasa de cambio USD/CLP.
-            nombres=["dolar"], # Nombre de la serie
-            desde=None,   # Fecha de inicio (None para obtener todos los datos)
-            hasta=None, # Fecha de fin (None para obtener todos los datos)
-            frecuencia="D",  # Diario
-            observado={"dolar": "last"}  # Valor más reciente reportado
+            series=[serie_dolar],
+            nombres=["dolar"],
+            desde=None,
+            hasta=None,
+            frecuencia="D",
+            observado={"dolar": "last"}
         )
 
         if df.empty or "dolar" not in df.columns:
             raise HTTPException(status_code=500, detail="No fue posible obtener el tipo de cambio del dólar.")
 
-        valor_dolar = df["dolar"].iloc[-1]  # Último valor registrado
-
-        valor_convertido = monto * valor_dolar # Conversión a CLP
+        valor_dolar = df["dolar"].iloc[-1]
+        valor_convertido = monto * valor_dolar
 
         return {
             "origen": "USD",
@@ -33,7 +46,7 @@ async def conversion_dolar_peso(monto: float = Query(1.0, gt=0, description="Mon
             "monto_origen": monto,
             "valor_unitario": valor_dolar,
             "valor_convertido": valor_convertido
-        } 
+        }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al consultar tasa de cambio: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al consultar tasa de cambio: {str(e)}") 

@@ -1,27 +1,57 @@
-from transbank.webpay.webpay_plus.transaction import Transaction # Importar la clase Transaction de Webpay Plus
-from fastapi import APIRouter # Importar APIRouter de FastAPI
-from transbank.common.integration_type import IntegrationType 
+from fastapi import APIRouter, HTTPException
+from transbank.webpay.webpay_plus.transaction import Transaction
+from transbank.common.integration_type import IntegrationType
+from dotenv import load_dotenv
+import os
 
-# Configuración en modo TEST (sandbox oficial de Transbank)
-Transaction.commerce_code = "597055555532"  # Código de comercio de prueba
-Transaction.api_key = "597055555532"        # API key de prueba
-Transaction.integration_type = IntegrationType.TEST  # Entorno de integración
+# Cargar variables desde .env
+load_dotenv(dotenv_path="credentials.env")
 
-RETURN_URL = "http://localhost:8000/pagos/confirmacion" # URL de retorno para la confirmación de la transacción
+# Obtener valores desde el entorno
+commerce_code = os.getenv("TRANSBANK_COMMERCE_CODE")
+api_key = os.getenv("TRANSBANK_API_KEY")
 
-router = APIRouter() # Crear una instancia de APIRouter para definir las rutas
+if not commerce_code or not api_key:
+    raise ValueError("Faltan las variables TRANSBANK_COMMERCE_CODE o TRANSBANK_API_KEY")
 
-def iniciar_transaccion(buy_order: str, session_id: str, amount: int): # Función para iniciar una transacción
-    transaction = Transaction() # Crear una instancia de Transaction
+# Configurar Transbank
+Transaction.commerce_code = commerce_code
+Transaction.api_key = api_key
+Transaction.integration_type = IntegrationType.TEST
+
+RETURN_URL = "http://localhost:8000/webpay/confirmacion"
+
+router = APIRouter()
+
+def iniciar_transaccion(buy_order: str, session_id: str, amount: int):
+    transaction = Transaction()
     response = transaction.create(
         buy_order=buy_order,
         session_id=session_id,
         amount=amount,
-        return_url=RETURN_URL # URL de retorno para la confirmación de la transacción
+        return_url=RETURN_URL
     )
-    return response.token, response.url 
+    return response.token, response.url
 
-def confirmar_transaccion(token_ws: str): # Función para confirmar una transacción
-    transaction = Transaction() # Crear una instancia de Transaction
-    result = transaction.commit(token_ws) # Confirmar la transacción utilizando el token
-    return result  # Función para obtener el estado de la transacción
+def confirmar_transaccion(token_ws: str):
+    transaction = Transaction()
+    result = transaction.commit(token_ws)
+    return result
+
+# Endpoint para iniciar transacción
+@router.post("/iniciar")
+def iniciar(buy_order: str, session_id: str, amount: int):
+    try:
+        token, url = iniciar_transaccion(buy_order, session_id, amount)
+        return {"token": token, "url": url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error iniciando transacción: {str(e)}")
+
+# Endpoint para confirmar transacción (retorno)
+@router.get("/confirmacion")
+def confirmar(token_ws: str):
+    try:
+        resultado = confirmar_transaccion(token_ws)
+        return {"estado": resultado.status, "detalle": resultado}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error confirmando transacción: {str(e)}")

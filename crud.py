@@ -51,3 +51,6 @@ def delete_producto(db: Session, codigo: str): # Elimina un producto de la base 
     db.delete(db_producto) # Elimina el producto de la sesión de la base de datos
     db.commit() # Confirma los cambios en la base de datos
     return True # Devuelve True si el producto fue eliminado con éxito
+
+def get_producto_by_id(db: Session, producto_id: int): # Obtiene un producto por su ID
+    return db.query(models.Producto).filter(models.Producto.id == producto_id).first() # Devuelve el primer producto que coincide con el ID

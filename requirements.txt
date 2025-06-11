@@ -6,3 +6,4 @@ bcchapi # para interactuar con la API de la Bolsa de Comercio de Chile
 numpy # para manejar datos numéricos
 transbank # para integrar con Transbank
 python-dotenv # para cargar variables de entorno desde un archivo .env
+test.py # para pruebas unitarias

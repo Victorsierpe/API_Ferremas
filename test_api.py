@@ -87,7 +87,7 @@ async def test_enviar_contacto():# Test para enviar contacto exitoso
             "email": "test@example.com",
             "mensaje": "Esto es una prueba"
         }
-        response = await ac.post("/contact/contact/", json=contacto)
+        response = await ac.post("/contact/", json=contacto) # Enviar contacto
         assert response.status_code == 200
         assert "Formulario recibido" in response.json()["mensaje"] # Verifica que el mensaje de éxito esté presente en la respuesta
 
@@ -99,5 +99,5 @@ async def test_enviar_contacto_email_invalido():
             "email": "email_invalido",
             "mensaje": "Mensaje de prueba"
         }
-        response = await ac.post("/contact/contact/", json=contacto)# Enviar contacto con email inválido
+        response = await ac.post("/contact/", json=contacto)# Enviar contacto con email inválido
         assert response.status_code == 422 # Verifica que el email inválido retorne un error 422

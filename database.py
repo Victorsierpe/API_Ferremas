@@ -1,8 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine # Importante para crear el motor de la base de datos
+from sqlalchemy.orm import declarative_base # Importante para definir modelos
+from sqlalchemy.orm import sessionmaker # Importante para manejar sesiones de la base de datos
 # URL de conexión (en este caso, SQLite local)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./Ferremas.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./Ferremas.db" # Cambia a tu base de datos preferida si es necesario
 
 # Crea el engine y configura la sesión
 engine = create_engine(

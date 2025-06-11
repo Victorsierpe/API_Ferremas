@@ -17,8 +17,8 @@ Base = declarative_base()
 
 # Dependencia para obtener la sesión de la base de datos
 def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
+    db = SessionLocal() # Crea una nueva sesión de base de datos
+    try: # Intenta usar la sesión
+        yield db # Devuelve la sesión para su uso
+    finally: # Asegura que la sesión se cierre al finalizar
         db.close() # Cierra la sesión al finalizar

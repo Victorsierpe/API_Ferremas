@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, Query
 from dotenv import load_dotenv
 import bcchapi
 import os
-import numpy as np
 
 # Cargar variables desde el archivo .env
 load_dotenv(dotenv_path="credentials.env")
@@ -22,8 +21,17 @@ router = APIRouter()
 
 @router.get("/conversion/dolar-peso")
 async def conversion_dolar_peso(monto: float = Query(1.0, gt=0, description="Monto en USD a convertir")):
+    """
+    Convierte una cantidad en dólares (USD) a pesos chilenos (CLP) usando el valor más reciente del Banco Central.
+
+    Args:
+        monto (float): Monto en dólares a convertir. Debe ser mayor que 0.
+
+    Returns:
+        dict: Resultado de la conversión con tipo de cambio actual.
+    """
     try:
-        serie_dolar = "F073.TCO.PRE.Z.D"
+        serie_dolar = "F073.TCO.PRE.Z.D"  # Código de la serie del dólar observado
 
         df = siete.cuadro(
             series=[serie_dolar],
@@ -49,4 +57,4 @@ async def conversion_dolar_peso(monto: float = Query(1.0, gt=0, description="Mon
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al consultar tasa de cambio: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Error al consultar tasa de cambio: {str(e)}")

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey # Importa las clases necesarias de SQLAlchemy
 from database import Base # Importa la clase Base de la base de datos
 from sqlalchemy.orm import relationship # Importa la relación de SQLAlchemy
-from datetime import datetime # Importa la clase datetime de la biblioteca datetime
+from datetime import datetime, timezone # Importa las clases necesarias para manejar fechas y horas
 
 # Define los modelos de la base de datos
 class Producto(Base):# Define la clase Producto que hereda de Base
@@ -19,7 +19,7 @@ class PrecioHistorico(Base):# Define la clase PrecioHistorico que hereda de Base
     __tablename__ = "precios_historicos" # Define la tabla precios_historicos
     id = Column(Integer, primary_key=True, index=True) # Define el ID del precio histórico como clave primaria y con índice
     producto_id = Column(Integer, ForeignKey("productos.id")) # Define el ID del producto como clave foránea que referencia a la tabla productos
-    fecha = Column(DateTime, default=datetime.utcnow) # Define la fecha del precio histórico como una fecha y hora, con valor por defecto de la fecha y hora actual
+    fecha = Column(DateTime, default=lambda: datetime.now(timezone.utc)) # Define la fecha del precio histórico como una fecha y hora, con valor por defecto de la fecha y hora actual
     precio = Column(Float) # Define el precio del producto como un número de punto flotante
 
     producto = relationship("Producto", back_populates="precios_historicos")# Relación con la clase Producto

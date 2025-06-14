@@ -4,7 +4,7 @@ from main import app # Importa la aplicación FastAPI desde el archivo main.py
 
 transport = ASGITransport(app=app) # Crea un transporte ASGI para la aplicación FastAPI
 
-
+#1 Test para crear un producto y asociarle un precio
 @pytest.mark.asyncio # Marca la función de prueba como asíncrona
 async def test_integracion_crear_producto_y_precio(): # Test para crear un producto y asociarle un precio
     async with AsyncClient(transport=transport, base_url="http://test") as ac: # Abre un cliente asíncrono para hacer peticiones HTTP
@@ -16,7 +16,7 @@ async def test_integracion_crear_producto_y_precio(): # Test para crear un produ
             "marca": "TestMarca",
             "modelo": "TestModelo",
             "stock": 15
-        } # Crea un producto de prueba
+        } # Crea un producto de prueba y asocia un precio
         r1 = await ac.post("/products/productos/", json=producto) # Envía una petición POST para crear el producto
         assert r1.status_code == 200 # Verifica que la respuesta sea exitosa (código 200)
         producto_id = r1.json()["id"] # Obtiene el ID del producto creado
@@ -27,6 +27,7 @@ async def test_integracion_crear_producto_y_precio(): # Test para crear un produ
         assert r2.json()["precio"] == 9900.0 # Verifica que el precio asociado sea el esperado
 
 
+#2 Test para obtener un producto por su código y verificar su precio
 @pytest.mark.asyncio # Test para obtener un producto por su código
 async def test_integracion_leer_precios_historicos_de_producto(): # Test para leer los precios históricos de un producto
     async with AsyncClient(transport=transport, base_url="http://test") as ac: # Abre un cliente asíncrono para hacer peticiones HTTP
@@ -49,7 +50,7 @@ async def test_integracion_leer_precios_historicos_de_producto(): # Test para le
         assert isinstance(r2.json(), list) # Verifica que la respuesta sea una lista
         assert len(r2.json()) >= 1 # Verifica que haya al menos un precio histórico asociado al producto
 
-
+#3 Test para guardar un contacto a través del formulario
 @pytest.mark.asyncio # Test para guardar un contacto a través del formulario
 async def test_integracion_contacto_guardado_correctamente(): # Test para guardar un contacto a través del formulario
     async with AsyncClient(transport=transport, base_url="http://test") as ac: # Abre un cliente asíncrono para hacer peticiones HTTP
